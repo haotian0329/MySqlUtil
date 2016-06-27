@@ -8,14 +8,14 @@
 #ifndef INCLUDE_MYSQLUTIL_H_
 #define INCLUDE_MYSQLUTIL_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <mysql.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #define HOST "100.81.152.47"
 #define USERNAME "root"
