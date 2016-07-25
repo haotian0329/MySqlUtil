@@ -1,75 +1,49 @@
-# coding: UTF-8
 import MySQLdb
 
-#cluster集群sql参数
-CLUSTER_IP_ADDR='192.168.0.51'
-CLUSTER_USER_NAME='root'
-CLUSTER_PASSWORD='111111'
-CLUSTER_PORT=3306
-CLUSTER_DB_NAME='security'
-
-
-#cluster2集群sql参数
-CLUSTER2_IP_ADDR='192.168.0.51'
-CLUSTER2_USER_NAME='root'
-CLUSTER2_PASSWORD='111111'
-CLUSTER2_PORT=3306
-CLUSTER2_DB_NAME='security'
-
-
-
-#sqlType为0表示cluster集群数据库，sqlType为1表示cluster2集群数据库
+#Function: mysql util class
 class SqlUtil():
-    def __init__(self,sqlType):
-        self.sqlType=sqlType
-        if self.sqlType==0:
-            self.ipAddr=CLUSTER_IP_ADDR
-	    self.userName=CLUSTER_USER_NAME
-	    self.passwd=CLUSTER_PASSWORD
-	    self.port=CLUSTER_PORT
-	    self.dbName=CLUSTER_DB_NAME
-	elif self.sqlType==1:
-            self.ipAddr=CLUSTER2_IP_ADDR
-	    self.userName=CLUSTER2_USER_NAME
-	    self.passwd=CLUSTER2_PASSWORD
-	    self.port=CLUSTER2_PORT
-	    self.dbName=CLUSTER2_DB_NAME
+    def __init__(self,ip_addr,user_name,passwd,db_name,port=3306):
+        self.ip_addr=ip_addr
+        self.user_name=user_name
+        self.passwd=passwd
+        self.db_name=db_name
+        self.port=port
 
+    #Function: connect to mysql server
     def connect(self):
         try:
-            self.conn=MySQLdb.connect(host=self.ipAddr,user=self.userName,passwd=self.passwd,port = self.port)
-            self.conn.select_db(self.dbName)
+            self.conn=MySQLdb.connect(host=self.ip_addr,user=self.user_name,passwd=self.passwd,port = self.port)
+            self.conn.select_db(self.db_name)
         except MySQLdb.Error,e:
-            print "Mysql Error %s" %(e)
+            print "Mysql connect Error %s" %(e)
 
+    #Function: disconnect to mysql server
     def disconnect(self):
         try:
            self.conn.close();
         except MySQLdb.Error,e:
-            print "Mysql Error %s" %(e)
+            print "Mysql disconnect Error %s" %(e)
 
-    def getDataFromSql(self,sqlStr):
+    #Function: get data from mysql db(select)
+    #Parameter: mysql query cmd string
+    def get_data_from_db(self,sql_cmd_str):
         try:
             cur=self.conn.cursor()
-            cur.execute(sqlStr)
+            cur.execute(sql_cmd_str)
             results=cur.fetchall()
             cur.close()
         except MySQLdb.Error,e:
-            print "Mysql Error %s" %(e)
+            print "Mysql get_data_from_db Error %s" %(e)
+            return []
         return results
 
-    def insertDataToSql(self,sqlStr):
+    #Function: exec mysql cmd string(insert into,delete,create table,drop table...)
+    #Parameter: mysql exec cmd string
+    def exec_db_cmd(self,sql_cmd_str):
         try:
             cur=self.conn.cursor()
-            cur.execute(sqlStr)
+            cur.execute(sql_cmd_str)
             self.conn.commit()
             cur.close()
         except MySQLdb.Error,e:
-            print "Mysql Error %s" %(e)
-
-    def getCursor(self):
-        try:
-            cur=self.conn.cursor()
-        except MySQLdb.Error,e:
-          print "Mysql Error %s" %(e)
-        return cur
+            print "Mysql exec_db_cmd Error %s" %(e)
